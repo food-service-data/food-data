@@ -1,0 +1,30 @@
+# .github/workflows/update-data.yml
+name: Update data.txt hourly
+
+on:
+  schedule:
+    - cron: '0 * * * *'  # jede Stunde
+  workflow_dispatch:      # manuell auslösbar
+
+jobs:
+  update-data:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        
+      - name: Fetch JSON and update data.txt
+        run: |
+          curl --location 'https://genussapp-api-mt.konkaapps.de/kms-mt-webservices/webresources/entity.speiseplanadvanced/getdata/3386/1' \
+          --header "Authorization: ${{ secrets.AUTH_HEADER }}" \
+          --silent --fail --show-error > data.txt
+
+      - name: Commit and push if changed
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          if [[ `git status --porcelain` ]]; then
+            git add data.txt
+            git commit -m "Update data.txt"
+            git push
+          fi
