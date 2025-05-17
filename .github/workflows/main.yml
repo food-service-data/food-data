@@ -1,32 +1,36 @@
-# .github/workflows/update-data.yml
 name: Update data.txt hourly
 
 on:
   schedule:
-    - cron: '0 * * * *'  # jede Stunde
-  workflow_dispatch:      # manuell auslösbar
+    - cron: '0 * * * *'  # Runs every hour
+  workflow_dispatch:      # Allows manual trigger
 
 jobs:
   update-data:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write  # Grant write permission for repository contents
+
     steps:
-      - name: Checkout repo
+      - name: Checkout repository
         uses: actions/checkout@v4
-        
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}  # Use GITHUB_TOKEN for authentication
+
       - name: Fetch JSON and update data.txt
         run: |
           curl --location 'https://genussapp-api-mt.konkaapps.de/kms-mt-webservices/webresources/entity.speiseplanadvanced/getdata/3386/1' \
           --header "Authorization: ${{ secrets.AUTH_HEADER }}" \
           --silent --fail --show-error > data.txt
-          
-      - name: Commit and push if changed
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Commit and push changes
         run: |
-          git config user.name "github-actions"
-          git config user.email "github-actions@github.com"
-          if [[ `git status --porcelain` ]]; then
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          if [[ -n "$(git status --porcelain)" ]]; then
             git add data.txt
             git commit -m "Update data.txt"
-            git push https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }} HEAD:main
+            git push origin HEAD:main
+          else
+            echo "No changes to commit"
           fi
