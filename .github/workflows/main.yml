@@ -2,7 +2,7 @@ name: Update data.txt hourly
 
 on:
   schedule:
-    - cron: '0 * * * *'  # Runs every hour
+    - cron: '17 * * * *'  # Runs every hour
   workflow_dispatch:      # Allows manual trigger
 
 jobs:
