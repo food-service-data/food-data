@@ -29,6 +29,12 @@ jobs:
           --header "Authorization: ${{ secrets.AUTH_HEADER }}" \
           --silent --fail --show-error > muenchen.txt
 
+      - name: Fetch JSON and update muenster.txt
+        run: |
+          curl --location 'https://genussapp-api-mt.konkaapps.de/kms-mt-webservices/webresources/entity.speiseplanadvanced/getdata/3416/1' \
+          --header "Authorization: ${{ secrets.AUTH_HEADER }}" \
+          --silent --fail --show-error > muenster.txt
+
       - name: Commit and push changes
         run: |
           git config user.name "github-actions[bot]"
