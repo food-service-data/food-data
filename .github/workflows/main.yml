@@ -17,11 +17,17 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}  # Use GITHUB_TOKEN for authentication
 
-      - name: Fetch JSON and update data.txt
+      - name: Fetch JSON and update karlsruhe.txt
         run: |
           curl --location 'https://genussapp-api-mt.konkaapps.de/kms-mt-webservices/webresources/entity.speiseplanadvanced/getdata/3386/1' \
           --header "Authorization: ${{ secrets.AUTH_HEADER }}" \
-          --silent --fail --show-error > data.txt
+          --silent --fail --show-error > karlsruhe.txt
+          
+      - name: Fetch JSON and update muenchen.txt
+        run: |
+          curl --location 'https://genussapp-api-mt.konkaapps.de/kms-mt-webservices/webresources/entity.speiseplanadvanced/getdata/3390/1' \
+          --header "Authorization: ${{ secrets.AUTH_HEADER }}" \
+          --silent --fail --show-error > muenchen.txt
 
       - name: Commit and push changes
         run: |
@@ -29,7 +35,7 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           if [[ -n "$(git status --porcelain)" ]]; then
             git add data.txt
-            git commit -m "Update data.txt"
+            git commit -m "update data"
             git push origin HEAD:main
           else
             echo "No changes to commit"
